@@ -1,28 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, target-densitydpi=medium-dpi, user-scalable=no">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black">
-	<meta name="format-detection" content="telephone=no">
-	<title>区聊</title>
-	<script src="https://wximg.gtimg.com/shake_tv/include/js/jsapi.js"></script>
-	<link rel="stylesheet" href="css/core.css" />
-	<link rel="stylesheet" href="css/dialog.css" />
-	<link rel="stylesheet" href="css/index.css" />
-</head>
-<body>
-	<div class="main">
-		
-		ss
-	</div>
-	
-	<script src="./js/config.js"></script>
-	<script src="./js/plugins/zepto.min.js"></script>
-	<script src="./js/plugins/common.js"></script>
-	<script type="text/javascript" src="js/plugins/md5.js" ></script>
-	<script src="./js/app/dialog.js"></script>
-	<script src="./js/app/index.js"></script>
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, target-densitydpi=medium-dpi, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="format-detection" content="telephone=no">
+		<title>区聊</title>
+		<script src="https://wximg.gtimg.com/shake_tv/include/js/jsapi.js"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<link rel="stylesheet" href="css/core.css" />
+		<link rel="stylesheet" href="css/dialog.css" />
+		<link rel="stylesheet" href="css/index.css" />
+	</head>
+	<body class="body-bg">
+		<div class="main-sugar">
+			<div class="title">糖包</div>
+			<div id="sugar-bag" class="content-sugar">
+				<div class="sugar-text">糖包名称</div>
+				<img src="img/hb-min.png" />
+			</div>
+		</div>
+
+		<dialog id="dia">
+			<input id="dialog-phone" placeholder="请输入手机号" style="width: 100%; margin-top: 10px;" />
+			<div style="width: 100%; margin-top: 10px; margin-bottom: 10px; display: flex;">
+				<input id="dialog-code" placeholder="请输入验证码" style="width: 60%;" />
+				<div id="dialog-getCode" style="width: 40%; text-align: center;">获取验证码</div>
+			</div>
+			<button id="dialog-btn" class="dialog-btn">确定</button>
+		</dialog>
+
+		<div id="main-detail" class="display-none">
+			<div class="sugar-money">80eth</div>
+			<img src="img/logo_top-min.png" />
+			<div class="divider"></div>
+			<div class="sugar-info">已领取3/10个</div>
+		</div>
+
+		<script src="./js/config.js"></script>
+		<script src="./js/plugins/zepto.min.js"></script>
+		<script src="./js/plugins/common.js"></script>
+		<script type="text/javascript" src="js/plugins/md5.js"></script>
+		<script src="./js/app/dialog.js"></script>
+		<script src="./js/app/index.js"></script>
+	</body>
 </html>
