@@ -35,4 +35,4 @@ var wxshareData = {"imgUrl": share_img,"link": share_url,"desc": share_desc,"tit
 var sharePage = '';
 var sharePageExpect = '';
 var dev = '';
-var md5Key='MyNameIswalletServerMd5KeyBtoN';
+var md5Key='H5MyNameIswalletServerMd5KeyBtoN';

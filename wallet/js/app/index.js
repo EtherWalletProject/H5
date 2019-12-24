@@ -16,9 +16,13 @@ $(function() {
 	H.index.init();
 });
 
-var BASE_URL = 'http://121.199.68.72:8080/';
-var GET_CODE = BASE_URL + 'mine/sendCode'; //发送手机验证码接口
-
+var BASE_URL = 'http://121.199.68.72/h5web/';
+var GET_CODE = BASE_URL + 'h5/sendCode'; //发送手机验证码接口
+var GET_LOGIN = BASE_URL + 'h5/login'; //发送手机验证码接口
+var GET_SUGAR_INFO = BASE_URL + 'h5/getSugarInfo'; //获取糖包信息接口
+var GET_SUGAR_DRAW = BASE_URL + 'h5/drawSugar'; //领糖包信息接口
+var GET_SUGAR_RECORD = BASE_URL + 'h5/drawSugarRecord'; //糖包领取记录
+var GET_MYSUGAR_RECORD = BASE_URL + 'h5/myDrawSugarRecord'; //获取自己是否糖包信息接口
 
 function showToast(msg, duration) {
 	duration = isNaN(duration) ? 3000 : duration;
@@ -37,28 +41,59 @@ function showToast(msg, duration) {
 	}, duration);
 }
 
-function post(obj, callBack) {
-	var httpRequest = new XMLHttpRequest(); //第一步：创建需要的对象
-	httpRequest.open('POST', GET_CODE, true); //第二步：打开连接/***发送json格式文件必须设置请求头 ；如下 - */
-	httpRequest.setRequestHeader("Content-type", "application/json"); //设置请求头 注：post方式必须设置请求头（在建立连接后设置请求头）var obj = { name: 'zhansgan', age: 18 };
-	httpRequest.send(JSON.stringify(obj)); //发送请求 将json写入send中
-	/**
-	 * 获取数据后的处理程序
-	 */
-	httpRequest.onreadystatechange = function() { //请求后的回调接口，可将请求成功后要执行的程序写在其中
-		if (httpRequest.readyState == 4 && httpRequest.status == 200) { //验证请求是否发送成功
-			var json = httpRequest.responseText; //获取到服务端返回的数据
-			console.log(json);
-			callback(json);
-		} else {
-			showToast("请求出错", 1000);
+function post(url, obj, callBack) {
+	$.ajax({
+		type: 'post',
+		url: url,
+		data: obj,
+		contentType: "application/json",
+		dataType: "json",
+		success: function(data) {
+			console.log(data);
+			if (url == GET_SUGAR_DRAW) callBack(data);
+			else if (data.code == 0) callBack(data.data);
+			else showToast(data.msg, 1000);
+		},
+		error: function(error) {
+			showToast(error, 1000);
 		}
-	};
+	})
 }
 
+function getQueryVariable(variable) {
+	var query = window.location.search.substring(1);
+	var vars = query.split("&");
+	for (var i = 0; i < vars.length; i++) {
+		var pair = vars[i].split("=");
+		if (pair[0] == variable) {
+			return pair[1];
+		}
+	}
+	return (false);
+}
+
+var currency;
+var number;
+
+//var sugarId = getQueryVariable("id");
+var sugarId = "15768307226811";
+
 $(function() {
+	sugarId = getQueryVariable("id");
+	var obj = "{'sugarId':'" + sugarId + "','sign':'" + hex_md5('sugarId=' + sugarId + '&key=' + md5Key) + "'}"
+	post(GET_SUGAR_INFO, obj, function(json) {
+		$('.sugar-text').html(json.title);
+		currency = json.currency;
+		number = json.number;
+	});
+
 	$('#sugar-bag').click(function() {
-		document.getElementById("dia").showModal();
+		var value = window.sessionStorage.getItem("wallet_uid");
+		if (value) {
+			openSugar(value);
+		} else {
+			document.getElementById("dia").showModal();
+		}
 	});
 
 	$('#dialog-getCode').click(function() {
@@ -67,12 +102,11 @@ $(function() {
 			showToast("手机号不能为空", 1000);
 			return;
 		}
-		var obj = {
-			name: 'phone',
-			age: phone
-		};
-		post(obj, function(json) {
-			console.log(json); // Cliton:Javascript
+		if (isSend) return;
+		time($('#dialog-getCode'));
+		var obj = "{'phone':'" + phone + "','sign':'" + hex_md5('phone=' + phone + '&key=' + md5Key) + "'}"
+		post(GET_CODE, obj, function(json) {
+			showToast("验证码发送成功", 1000);
 		});
 	});
 
@@ -87,18 +121,74 @@ $(function() {
 			showToast("验证码不能为空", 1000);
 			return;
 		}
-		document.getElementById("dia").close();
-		$('body').removeClass('body-bg');
-		$('.main-sugar').addClass('display-none');
-		$('#main-detail').removeClass('display-none');
-		var groupContent = $('#main-detail');
-		for (var i = 1; i <= 15; i++) {
-			groupContent.append('<div class="divider" style="height: 1px;"></div>' +
-				'<div class="sugar-item">' +
-				'<div class="item-number">12eth</div>' +
-				'<div class="item-name">Tom</div>' +
-				'<div class="item-time">2019-12-19 15:09</div>' +
-				'</div>');
-		}
+		var obj = "{'phone':'" + phone + "','verificationCode':'" + code + "','sign':'" + hex_md5('phone=' + phone +
+			'&verificationCode=' + code + '&key=' + md5Key) + "'}"
+		post(GET_LOGIN, obj, function(json) {
+			showToast("登陆成功", 1000);
+			window.sessionStorage.setItem("wallet_uid", json.uId);
+			openSugar(json.uId);
+		});
 	});
 });
+
+function openSugar(uid) {
+	document.getElementById("dia").close();
+	$('body').removeClass('body-bg');
+	$('.main-sugar').addClass('display-none');
+	$('#main-detail').removeClass('display-none');
+
+	var obj = "{'sugarId':'" + sugarId + "','uId':'" + uid + "','sign':'" + hex_md5('sugarId=' + sugarId +
+		'&uId=' + uid + '&key=' + md5Key) + "'}"
+	post(GET_MYSUGAR_RECORD, obj, function(json) {
+		if (json.amount) {
+			getSugarRecord(uid);
+			$('.sugar-money').html(json.amount + currency);
+		} else {
+			post(GET_SUGAR_DRAW, obj, function(json) {
+				if (json.code == 0) {
+					showToast("领取成功", 1000);
+					$('.sugar-money').html(json.data + currency);
+				} else {
+					$('.sugar-money').html('已领完');
+				}
+				getSugarRecord(uid);
+			});
+		}
+	});
+}
+
+function getSugarRecord(uid){
+	var obj = "{'sugarId':'" + sugarId + "','uId':'" + uid + "','sign':'" + hex_md5('sugarId=' + sugarId +
+		'&uId=' + uid + '&key=' + md5Key) + "'}"
+	post(GET_SUGAR_RECORD, obj, function(json) {
+		var groupContent = $('#main-detail');
+		for (var i = 0; i < json.length; i++) {
+			groupContent.append('<div class="divider" style="height: 1px;"></div>' +
+				'<div class="sugar-item">' +
+				'<div class="item-number">' + json[i].amount + currency + '</div>' +
+				'<div class="item-name">' + json[i].nickName + '</div>' +
+				'<div class="item-time">' + json[i].createTime + '</div>' +
+				'</div>');
+		}
+		$('.sugar-info').html('已领取' + json.length + '/' + number + '个');
+	});
+}
+
+var wait = 60;
+var isSend = false;
+
+function time(o) {
+	if (wait == 0) {
+		isSend = false;
+		o.html("获取验证码");
+		wait = 60;
+	} else {
+		isSend = true;
+		o.html("重新发送(" + wait + ")");
+		wait--;
+		setTimeout(function() {
+				time(o)
+			},
+			1000)
+	}
+}
