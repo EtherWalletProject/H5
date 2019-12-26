@@ -116,11 +116,12 @@ $(function() {
 			showToast("手机号不能为空", 1000);
 			return;
 		}
-		var code = $('#dialog-code').val();
-		if (!code) {
-			showToast("验证码不能为空", 1000);
-			return;
-		}
+		var code = '66666';
+		// var code = $('#dialog-code').val();
+		// if (!code) {
+		// 	showToast("验证码不能为空", 1000);
+		// 	return;
+		// }
 		var obj = "{'phone':'" + phone + "','verificationCode':'" + code + "','sign':'" + hex_md5('phone=' + phone +
 			'&verificationCode=' + code + '&key=' + md5Key) + "'}"
 		post(GET_LOGIN, obj, function(json) {
