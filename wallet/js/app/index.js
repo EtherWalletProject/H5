@@ -50,7 +50,7 @@ function post(url, obj, callBack) {
 		dataType: "json",
 		success: function(data) {
 			console.log(data);
-			if (url == GET_SUGAR_DRAW) callBack(data);
+			if (url == GET_SUGAR_DRAW || url == GET_MYSUGAR_RECORD) callBack(data);
 			else if (data.code == 0) callBack(data.data);
 			else showToast(data.msg, 1000);
 		},
@@ -92,7 +92,7 @@ $(function() {
 		if (value) {
 			openSugar(value);
 		} else {
-			document.getElementById("dia").showModal();
+			$('#dia').removeClass('display-none');
 		}
 	});
 
@@ -132,7 +132,6 @@ $(function() {
 });
 
 function openSugar(uid) {
-	document.getElementById("dia").close();
 	$('body').removeClass('body-bg');
 	$('.main-sugar').addClass('display-none');
 	$('#main-detail').removeClass('display-none');
@@ -140,9 +139,10 @@ function openSugar(uid) {
 	var obj = "{'sugarId':'" + sugarId + "','uId':'" + uid + "','sign':'" + hex_md5('sugarId=' + sugarId +
 		'&uId=' + uid + '&key=' + md5Key) + "'}"
 	post(GET_MYSUGAR_RECORD, obj, function(json) {
-		if (json.amount) {
+		if (json.code == 0) {
+			var data = json.data;
 			getSugarRecord(uid);
-			$('.sugar-money').html(json.amount + currency);
+			$('.sugar-money').html(data.amount + currency);
 		} else {
 			post(GET_SUGAR_DRAW, obj, function(json) {
 				if (json.code == 0) {
