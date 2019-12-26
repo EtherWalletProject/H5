@@ -1,5 +1,13 @@
+html,
+body {
+	height: 100%;
+}
+
 .body-bg {
 	background-image: url(../img/logo-min.png);
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
 }
 
 .title {
